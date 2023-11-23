@@ -9,7 +9,23 @@ blogsRouter.get('/api/blogs', async (request, response) => {
 blogsRouter.post('/api/blogs', async (request, response) => {
     const blog = new Blog(request.body)
     const savedBlog = await blog.save()
-    savedBlog.status(201).json(savedBlog)
+    response.status(201).json(savedBlog)
   })
+
+blogsRouter.delete('/api/blogs/:id', async (request, response) => {
+  await Blog.findByIdAndDelete(request.params.id)
+  response.status(204).end()
+})
+
+blogsRouter.put('/api/blogs/:id', async (request, response, next) => {
+  const blog = request.body
+
+  await Blog.findByIdAndUpdate(request.params.id, blog, { new: true })
+    .then(updatedBlog => {
+      response.json(updatedBlog)
+    })
+    .catch(error => next(error))
+})
+
   
 module.exports = blogsRouter
